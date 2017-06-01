@@ -1,0 +1,25 @@
+social_auth_vk.settings_form:
+  path: '/admin/config/social-api/social-auth/vk'
+  defaults:
+    _title: 'VK Account Settings'
+    _form: 'Drupal\social_auth_vk\Form\VkAuthSettingsForm'
+  requirements:
+    _permission: 'administer social api authentication'
+
+social_auth_vk.redirect_to_vk:
+  path: 'user/login/vk'
+  defaults:
+    _controller: 'Drupal\social_auth_vk\Controller\VkAuthController::redirectToVk'
+  requirements:
+    _role: 'anonymous'
+  options:
+    no_cache: TRUE
+
+social_auth_vk.callback:
+  path: '/user/login/vk/callback'
+  defaults:
+    _controller: 'Drupal\social_auth_vk\Controller\VkAuthController::callback'
+  requirements:
+    _role: 'anonymous'
+  options:
+    no_cache: TRUE

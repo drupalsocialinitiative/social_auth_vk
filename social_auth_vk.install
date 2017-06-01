@@ -1,0 +1,62 @@
+<?php
+
+/**
+ * @file
+ * Install and uninstall functions for the Vk.com Login module.
+ */
+
+use Drupal\social_api\Utility\SocialApiImplementerInstaller;
+use Drupal\social_auth\Controller\SocialAuthController;
+
+/**
+ * Implements hook_requirements().
+ *
+ * This hook allows to check if the required libraries for your implementer
+ * has been downloaded.
+ */
+function social_auth_vk_requirements($phase) {
+  $requirements = [];
+
+  // Social API should be installed at this point in order to check library.
+  \Drupal::service('module_installer')->install(['social_api']);
+
+  // When the site builder wants to enable this module.
+  if ($phase == 'install') {
+    // We check that the required library was downloaded beforehand.
+    $requirements = SocialApiImplementerInstaller::checkLibrary('social_auth_vk', 'Social Auth Vkontakte', 'vladkens/vk', '0.1.0', '0.2.0');
+  }
+
+  return $requirements;
+}
+
+/**
+ * Implements hook_install().
+ *
+ * Method setLoginButtonSettings() sets up the settings for the login button.
+ *
+ * This button is used for the 'Social Auth Login Block' to add a link to
+ * allow users login with the implementing service.
+ *
+ * The first argument must be the name of the module you are building.
+ * The second argument is the route the link will point to.
+ * The third one is the path (from the root of the module) to the image which
+ * will be used as a link in the 'Social Auth Login Block'.
+ */
+function social_auth_vk_install() {
+  SocialAuthController::setLoginButtonSettings('social_auth_vk', 'social_auth_vk.redirect_to_vk', 'img/vk_logo.svg');
+}
+
+/**
+ * Implements hook_uninstall().
+ *
+ * Method deleteLoginButtonSettings() deletes the settings for the login button.
+ *
+ * When the module is uninstall, you need to remove the login button for the
+ * implementer from the 'Social Auth Login Block'.
+ *
+ * The argument passed to the method must be the name of the module you are
+ * building.
+ */
+function social_auth_vk_uninstall() {
+  SocialAuthController::deleteLoginButtonSettings('social_auth_vk');
+}

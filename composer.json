@@ -1,0 +1,22 @@
+{
+    "name": "drupal/social_auth_vk",
+    "type": "drupal-module",
+    "description": "Social Auth integration for Vkontakte",
+    "keywords": ["Drupal"],
+    "license": "GPL-2.0+",
+    "homepage": "https://www.drupal.org/project/social_auth_vk",
+    "minimum-stability": "dev",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/social_auth_vk",
+        "source": "http://cgit.drupalcode.org/social_auth_vk"
+    },
+    "require": {
+        "vladkens/vk": "~0.1.9"
+    },
+    "authors": [
+        {
+            "name": "CimpleO",
+            "email": "dev@cimpleo.com"
+        }
+    ]
+}
