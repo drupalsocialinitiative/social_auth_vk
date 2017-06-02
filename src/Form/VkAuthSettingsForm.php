@@ -39,25 +39,25 @@ class VkAuthSettingsForm extends SocialAuthSettingsForm {
     $form['vk_settings']['client_id'] = [
       '#type' => 'textfield',
       '#required' => TRUE,
-      '#title' => $this->t('Client ID'),
+      '#title' => $this->t('Application ID'),
       '#default_value' => $config->get('client_id'),
-      '#description' => $this->t('Copy the Client ID here'),
+      '#description' => $this->t('Copy the Application ID here'),
     ];
 
     $form['vk_settings']['private_key'] = [
       '#type' => 'textfield',
       '#required' => TRUE,
-      '#title' => $this->t('Private Key'),
+      '#title' => $this->t('Secure key'),
       '#default_value' => $config->get('private_key'),
-      '#description' => $this->t('Copy the Private Key here'),
+      '#description' => $this->t('Copy the Secure key here'),
     ];
 
     $form['vk_settings']['client_secret'] = [
       '#type' => 'textfield',
       '#required' => TRUE,
-      '#title' => $this->t('Client Secret'),
+      '#title' => $this->t('Service token'),
       '#default_value' => $config->get('client_secret'),
-      '#description' => $this->t('Copy the Client Secret here'),
+      '#description' => $this->t('Copy the Service token here'),
     ];
 
     return parent::buildForm($form, $form_state);
