@@ -9,7 +9,6 @@ CONTENTS OF THIS FILE
  * Installation
  * Configuration
  * How it works
- * Support requests
 
 INTRODUCTION
 ------------
@@ -50,6 +49,16 @@ CONFIGURATION
 
  * Add your Vkontakte application OAuth information in
    Configuration » User Authentication » Vkontakte.
+   You need to create your Vkontakte application for a website:
+   https://vk.com/editapp?act=create
+
+   Copy and insert Application ID, Private Key, Access Key 
+   from your application settings to Social Auth VK configuration form:
+   /admin/config/social-api/social-auth/vk
+
+   Also you need to add all working site domains to application settings. And add 
+   Verified redirect URI for each domain:
+   http://example.com/user/login/vk/callback
 
  * Place a Social Auth Login block in Structure » Block Layout.
 
