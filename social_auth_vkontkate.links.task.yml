@@ -1,4 +1,0 @@
-social_auth_vkontkate.settings.tab:
-  title: 'Vkontkate'
-  route_name: social_auth_vkontkate.settings_form
-  base_route: social_auth.integrations

@@ -1,5 +1,0 @@
-services:
-  vk_auth.manager:
-    class: Drupal\social_auth_vk\VkAuthManager
-    arguments:
-      - '@request_stack'
