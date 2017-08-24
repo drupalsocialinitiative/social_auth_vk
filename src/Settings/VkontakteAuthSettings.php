@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\social_auth_vkontkate\Settings;
+namespace Drupal\social_auth_vkontakte\Settings;
 
 use Drupal\social_api\Settings\SettingsBase;
 
 /**
- * Defines methods to get Social Auth Vkontkate settings.
+ * Defines methods to get Social Auth Vkontakte settings.
  */
-class VkontkateAuthSettings extends SettingsBase implements VkontkateAuthSettingsInterface {
+class VkontakteAuthSettings extends SettingsBase implements VkontakteAuthSettingsInterface {
 
   /**
    * Client ID.

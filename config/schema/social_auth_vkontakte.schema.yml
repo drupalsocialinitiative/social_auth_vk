@@ -1,6 +1,6 @@
-social_auth_vkontkate.settings:
+social_auth_vkontakte.settings:
   type: config_object
-  label: 'Social Auth Vkontkate settings'
+  label: 'Social Auth Vkontakte settings'
   mapping:
     client_id:
       type: string

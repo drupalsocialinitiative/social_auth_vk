@@ -14,7 +14,7 @@ CONTENTS OF THIS FILE
 INTRODUCTION
 ------------
 
-Social Auth Vkontkate Module is a Vkontkate Authentication integration for Drupal.
+Social Auth Vkontakte Module is a Vkontakte Authentication integration for Drupal.
 
 REQUIREMENTS
 ------------
@@ -29,14 +29,14 @@ RECOMMENDED MODULES
 -------------------
 
  * Composer Manager (https://www.drupal.org/project/composer_manager):
-   This module will help to install the League PHP library and Vkontkate base library for the league,
+   This module will help to install the League PHP library and Vkontakte base library for the league,
    which are the libraries required to make user authentication.
 
 INSTALLATION
 ------------
 
- * Download Vkontkate Base Library for TheLeague OAuth2 PHP library
-   (https://github.com/thephpleague/oauth2-vkontkate). We recommend to use
+ * Download Vkontakte Base Library for TheLeague OAuth2 PHP library
+   (https://github.com/thephpleague/oauth2-vkontakte). We recommend to use
    Composer Manager module to install the library.
 
  * Install the dependencies: Social API and Social Auth.
@@ -48,10 +48,10 @@ INSTALLATION
 CONFIGURATION
 -------------
 
- * Add your Vkontkate project OAuth information in
-   Configuration » User Authentication » Vkontkate.
+ * Add your Vkontakte project OAuth information in
+   Configuration » User Authentication » Vkontakte.
 
- * Place a Social Auth Vkontkate block in Structure » Block Layout.
+ * Place a Social Auth Vkontakte block in Structure » Block Layout.
 
  * If you already have a Social Auth Login block in the site, rebuild the cache.
 
@@ -59,15 +59,15 @@ CONFIGURATION
 HOW IT WORKS
 ------------
 
-User can click on the Vkontkate logo on the Social Auth Login block
+User can click on the Vkontakte logo on the Social Auth Login block
 You can also add a button or link anywhere on the site that points
-to /user/login/vkontkate, so theming and customizing the button or link
+to /user/login/vkontakte, so theming and customizing the button or link
 is very flexible.
 
-When the user opens the /user/login/vkontkate link, it automatically takes
-user to Vkontkate Accounts for authentication. Vkontkate then returns the user to
+When the user opens the /user/login/vkontakte link, it automatically takes
+user to Vkontakte Accounts for authentication. Vkontakte then returns the user to
 Drupal site. If we have an existing Drupal user with the same email address
-provided by Vkontkate, that user is logged in. Otherwise a new Drupal user is
+provided by Vkontakte, that user is logged in. Otherwise a new Drupal user is
 created.
 
 SUPPORT REQUESTS
@@ -77,7 +77,7 @@ Before posting a support request, carefully read the installation
 instructions provided in module documentation page.
 
 Before posting a support request, check Composer Manager status report at
-admin/reports/composer-manager. This status page will show the Vkontkate The League OAuth2 Base
+admin/reports/composer-manager. This status page will show the Vkontakte The League OAuth2 Base
 PHP library version if Drupal can detect it.
 
 Before posting a support request, check Recent log entries at

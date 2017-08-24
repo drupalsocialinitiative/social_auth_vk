@@ -1,0 +1,25 @@
+social_auth_vkontakte.redirect_to_vkontakte:
+  path: 'user/login/vkontakte'
+  defaults:
+    _controller: '\Drupal\social_auth_vkontakte\Controller\VkontakteAuthController::redirectToVkontakte'
+  requirements:
+    _role: 'anonymous'
+  options:
+    no_cache: TRUE
+
+social_auth_vkontakte.callback:
+  path: 'user/login/vkontakte/callback'
+  defaults:
+    _controller: '\Drupal\social_auth_vkontakte\Controller\VkontakteAuthController::callback'
+  requirements:
+    _role: 'anonymous'
+  options:
+    no_cache: TRUE
+
+social_auth_vkontakte.settings_form:
+  path: 'admin/config/social-api/social-auth/vkontakte'
+  defaults:
+    _title: 'Social Auth Vkontakte settings'
+    _form: '\Drupal\social_auth_vkontakte\Form\VkontakteAuthSettingsForm'
+  requirements:
+    _permission: 'administer social api authentication'

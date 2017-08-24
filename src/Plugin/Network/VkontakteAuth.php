@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\social_auth_vkontkate\Plugin\Network;
+namespace Drupal\social_auth_vkontakte\Plugin\Network;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -9,29 +9,29 @@ use Drupal\Core\Routing\RequestContext;
 use Drupal\social_auth\SocialAuthDataHandler;
 use Drupal\social_api\Plugin\NetworkBase;
 use Drupal\social_api\SocialApiException;
-use Drupal\social_auth_vkontkate\Settings\VkontkateAuthSettings;
+use Drupal\social_auth_vkontakte\Settings\VkontakteAuthSettings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use J4k\OAuth2\Client\Provider\Vkontakte;
 use Drupal\Core\Site\Settings;
 
 /**
- * Defines a Network Plugin for Social Auth Vkontkate.
+ * Defines a Network Plugin for Social Auth Vkontakte.
  *
- * @package Drupal\simple_vkontkate_connect\Plugin\Network
+ * @package Drupal\simple_vkontakte_connect\Plugin\Network
  *
  * @Network(
- *   id = "social_auth_vkontkate",
- *   social_network = "Vkontkate",
+ *   id = "social_auth_vkontakte",
+ *   social_network = "Vkontakte",
  *   type = "social_auth",
  *   handlers = {
  *     "settings": {
- *       "class": "\Drupal\social_auth_vkontkate\Settings\VkontkateAuthSettings",
- *       "config_id": "social_auth_vkontkate.settings"
+ *       "class": "\Drupal\social_auth_vkontakte\Settings\VkontakteAuthSettings",
+ *       "config_id": "social_auth_vkontakte.settings"
  *     }
  *   }
  * )
  */
-class VkontkateAuth extends NetworkBase implements VkontkateAuthInterface {
+class VkontakteAuth extends NetworkBase implements VkontakteAuthInterface {
 
   /**
    * The Social Auth Data Handler.
@@ -79,7 +79,7 @@ class VkontkateAuth extends NetworkBase implements VkontkateAuthInterface {
   }
 
   /**
-   * VkontkateAuth constructor.
+   * VkontakteAuth constructor.
    *
    * @param \Drupal\social_auth\SocialAuthDataHandler $data_handler
    *   The data handler.
@@ -122,7 +122,7 @@ class VkontkateAuth extends NetworkBase implements VkontkateAuthInterface {
   /**
    * Sets the underlying SDK library.
    *
-   * @return \League\OAuth2\Client\Provider\Vkontkate
+   * @return \League\OAuth2\Client\Provider\Vkontakte
    *   The initialized 3rd party library instance.
    *
    * @throws SocialApiException
@@ -132,9 +132,9 @@ class VkontkateAuth extends NetworkBase implements VkontkateAuthInterface {
 
     $class_name = 'J4k\OAuth2\Client\Provider\Vkontakte';
     if (!class_exists($class_name)) {
-      throw new SocialApiException(sprintf('The Vkontkate Library for the league oAuth not found. Class: %s.', $class_name));
+      throw new SocialApiException(sprintf('The Vkontakte Library for the league oAuth not found. Class: %s.', $class_name));
     }
-    /* @var \Drupal\social_auth_vkontkate\Settings\VkontkateAuthSettings $settings */
+    /* @var \Drupal\social_auth_vkontakte\Settings\VkontakteAuthSettings $settings */
     $settings = $this->settings;
     // Proxy configuration data for outward proxy.
     $proxyUrl = $this->siteSettings->get("http_client_config")["proxy"]["http"];
@@ -144,7 +144,7 @@ class VkontkateAuth extends NetworkBase implements VkontkateAuthInterface {
         $league_settings = [
           'clientId' => $settings->getClientId(),
           'clientSecret' => $settings->getClientSecret(),
-          'redirectUri' => $this->requestContext->getCompleteBaseUrl() . '/user/login/vkontkate/callback',
+          'redirectUri' => $this->requestContext->getCompleteBaseUrl() . '/user/login/vkontakte/callback',
           'proxy' => $proxyUrl,
         ];
       }
@@ -152,7 +152,7 @@ class VkontkateAuth extends NetworkBase implements VkontkateAuthInterface {
         $league_settings = [
           'clientId' => $settings->getClientId(),
           'clientSecret' => $settings->getClientSecret(),
-          'redirectUri' => $this->requestContext->getCompleteBaseUrl() . '/user/login/vkontkate/callback',
+          'redirectUri' => $this->requestContext->getCompleteBaseUrl() . '/user/login/vkontakte/callback',
         ];
       }
 
@@ -164,19 +164,19 @@ class VkontkateAuth extends NetworkBase implements VkontkateAuthInterface {
   /**
    * Checks that module is configured.
    *
-   * @param \Drupal\social_auth_vkontkate\Settings\VkontkateAuthSettings $settings
-   *   The Vkontkate auth settings.
+   * @param \Drupal\social_auth_vkontakte\Settings\VkontakteAuthSettings $settings
+   *   The Vkontakte auth settings.
    *
    * @return bool
    *   True if module is configured.
    *   False otherwise.
    */
-  protected function validateConfig(VkontkateAuthSettings $settings) {
+  protected function validateConfig(VkontakteAuthSettings $settings) {
     $client_id = $settings->getClientId();
     $client_secret = $settings->getClientSecret();
     if (!$client_id || !$client_secret) {
       $this->loggerFactory
-        ->get('social_auth_vkontkate')
+        ->get('social_auth_vkontakte')
         ->error('Define Client ID and Client Secret on module settings.');
       return FALSE;
     }

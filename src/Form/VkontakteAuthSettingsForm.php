@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\social_auth_vkontkate\Form;
+namespace Drupal\social_auth_vkontakte\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -11,9 +11,9 @@ use Drupal\social_auth\Form\SocialAuthSettingsForm;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Settings form for Social Auth Vkontkate.
+ * Settings form for Social Auth Vkontakte.
  */
-class VkontkateAuthSettingsForm extends SocialAuthSettingsForm {
+class VkontakteAuthSettingsForm extends SocialAuthSettingsForm {
 
   /**
    * The request context.
@@ -57,7 +57,7 @@ class VkontkateAuthSettingsForm extends SocialAuthSettingsForm {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'social_auth_vkontkate_settings';
+    return 'social_auth_vkontakte_settings';
   }
 
   /**
@@ -66,7 +66,7 @@ class VkontkateAuthSettingsForm extends SocialAuthSettingsForm {
   protected function getEditableConfigNames() {
     return array_merge(
       parent::getEditableConfigNames(),
-      ['social_auth_vkontkate.settings']
+      ['social_auth_vkontakte.settings']
     );
   }
 
@@ -74,16 +74,16 @@ class VkontkateAuthSettingsForm extends SocialAuthSettingsForm {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('social_auth_vkontkate.settings');
+    $config = $this->config('social_auth_vkontakte.settings');
 
-    $form['vkontkate_settings'] = [
+    $form['vkontakte_settings'] = [
       '#type' => 'details',
-      '#title' => $this->t('Vkontkate Client settings'),
+      '#title' => $this->t('Vkontakte Client settings'),
       '#open' => TRUE,
-      '#description' => $this->t('You need to first create a Vkontkate App at <a href="@vkontkate-dev">@vkontkate-dev</a>', ['@vkontkate-dev' => 'https://vk.com/apps?act=manage']),
+      '#description' => $this->t('You need to first create a Vkontakte App at <a href="@vkontakte-dev">@vkontakte-dev</a>', ['@vkontakte-dev' => 'https://vk.com/apps?act=manage']),
     ];
 
-    $form['vkontkate_settings']['client_id'] = [
+    $form['vkontakte_settings']['client_id'] = [
       '#type' => 'textfield',
       '#required' => TRUE,
       '#title' => $this->t('Client ID'),
@@ -91,7 +91,7 @@ class VkontkateAuthSettingsForm extends SocialAuthSettingsForm {
       '#description' => $this->t('Copy the Client ID here.'),
     ];
 
-    $form['vkontkate_settings']['client_secret'] = [
+    $form['vkontakte_settings']['client_secret'] = [
       '#type' => 'textfield',
       '#required' => TRUE,
       '#title' => $this->t('Client Secret'),
@@ -99,30 +99,30 @@ class VkontkateAuthSettingsForm extends SocialAuthSettingsForm {
       '#description' => $this->t('Copy the Client Secret here.'),
     ];
 
-    $form['vkontkate_settings']['authorized_redirect_url'] = [
+    $form['vkontakte_settings']['authorized_redirect_url'] = [
       '#type' => 'textfield',
       '#disabled' => TRUE,
       '#title' => $this->t('Authorized redirect URIs'),
-      '#description' => $this->t('Copy this value to <em>Authorized redirect URIs</em> field of your Vkontkate App settings.'),
-      '#default_value' => $GLOBALS['base_url'] . '/user/login/vkontkate/callback',
+      '#description' => $this->t('Copy this value to <em>Authorized redirect URIs</em> field of your Vkontakte App settings.'),
+      '#default_value' => $GLOBALS['base_url'] . '/user/login/vkontakte/callback',
     ];
 
-    $form['vkontkate_settings']['authorized_javascript_origin'] = [
+    $form['vkontakte_settings']['authorized_javascript_origin'] = [
       '#type' => 'textfield',
       '#disabled' => TRUE,
       '#title' => $this->t('Authorized Javascript Origin'),
-      '#description' => $this->t('Copy this value to <em>Authorized Javascript Origins</em> field of your Vkontkate App settings.'),
+      '#description' => $this->t('Copy this value to <em>Authorized Javascript Origins</em> field of your Vkontakte App settings.'),
       '#default_value' => $this->requestContext->getHost(),
     ];
 
-    $form['vkontkate_settings']['scopes'] = [
+    $form['vkontakte_settings']['scopes'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Scopes for API call'),
       '#default_value' => $config->get('scopes'),
       '#description' => $this->t('Define the requested scopes to make API calls.'),
     ];
 
-    $form['vkontkate_settings']['api_calls'] = [
+    $form['vkontakte_settings']['api_calls'] = [
       '#type' => 'textarea',
       '#title' => $this->t('API calls to be made to collect data'),
       '#default_value' => $config->get('api_calls'),
@@ -137,7 +137,7 @@ class VkontkateAuthSettingsForm extends SocialAuthSettingsForm {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValues();
-    $this->config('social_auth_vkontkate.settings')
+    $this->config('social_auth_vkontakte.settings')
       ->set('client_id', $values['client_id'])
       ->set('client_secret', $values['client_secret'])
       ->set('scopes', $values['scopes'])

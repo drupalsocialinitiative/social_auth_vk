@@ -1,11 +1,11 @@
 <?php
 
-namespace Drupal\social_auth_vkontkate\Settings;
+namespace Drupal\social_auth_vkontakte\Settings;
 
 /**
- * Defines an interface for Social Auth Vkontkate settings.
+ * Defines an interface for Social Auth Vkontakte settings.
  */
-interface VkontkateAuthSettingsInterface {
+interface VkontakteAuthSettingsInterface {
 
   /**
    * Gets the client ID.

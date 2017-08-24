@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\social_auth_vkontkate;
+namespace Drupal\social_auth_vkontakte;
 
 use Drupal\social_auth\AuthManager\OAuth2Manager;
 use Drupal\Core\Config\ConfigFactory;
@@ -10,9 +10,9 @@ use Drupal\Core\Routing\UrlGeneratorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Contains all the logic for Vkontkate login integration.
+ * Contains all the logic for Vkontakte login integration.
  */
-class VkontkateAuthManager extends OAuth2Manager {
+class VkontakteAuthManager extends OAuth2Manager {
 
   /**
    * The logger channel.
@@ -43,22 +43,22 @@ class VkontkateAuthManager extends OAuth2Manager {
   protected $urlGenerator;
 
   /**
-   * The Vkontkate client object.
+   * The Vkontakte client object.
    *
-   * @var \League\OAuth2\Client\Provider\Vkontkate
+   * @var \League\OAuth2\Client\Provider\Vkontakte
    */
   protected $client;
   /**
-   * The Vkontkate access token.
+   * The Vkontakte access token.
    *
    * @var \League\OAuth2\Client\Token\AccessToken
    */
   protected $token;
 
   /**
-   * The Vkontkate user.
+   * The Vkontakte user.
    *
-   * @var \League\OAuth2\Client\Provider\VkontkateUser
+   * @var \League\OAuth2\Client\Provider\VkontakteUser
    */
   protected $user;
 
@@ -70,7 +70,7 @@ class VkontkateAuthManager extends OAuth2Manager {
   protected $scopes;
 
   /**
-   * Social Auth Vkontkate Settings.
+   * Social Auth Vkontakte Settings.
    *
    * @var array
    */
@@ -96,7 +96,7 @@ class VkontkateAuthManager extends OAuth2Manager {
     $this->eventDispatcher    = $event_dispatcher;
     $this->entityFieldManager = $entity_field_manager;
     $this->urlGenerator       = $url_generator;
-    $this->config             = $configFactory->getEditable('social_auth_vkontkate.settings');
+    $this->config             = $configFactory->getEditable('social_auth_vkontakte.settings');
   }
 
   /**
@@ -113,8 +113,8 @@ class VkontkateAuthManager extends OAuth2Manager {
   /**
    * Gets the data by using the access token returned.
    *
-   * @return League\OAuth2\Client\Provider\VkontkateUser
-   *   User info returned by the Vkontkate.
+   * @return League\OAuth2\Client\Provider\VkontakteUser
+   *   User info returned by the Vkontakte.
    */
   public function getUserInfo() {
     $this->user = $this->client->getResourceOwner($this->token);
@@ -146,16 +146,16 @@ class VkontkateAuthManager extends OAuth2Manager {
   }
 
   /**
-   * Returns the Vkontkate login URL where user will be redirected.
+   * Returns the Vkontakte login URL where user will be redirected.
    *
    * @return string
-   *   Absolute Vkontkate login URL where user will be redirected
+   *   Absolute Vkontakte login URL where user will be redirected
    */
-  public function getVkontkateLoginUrl() {
+  public function getVkontakteLoginUrl() {
     $scopes = ['email', 'offline', 'friends'];
 
-    $vkontkate_scopes = explode(PHP_EOL, $this->getScopes());
-    foreach ($vkontkate_scopes as $scope) {
+    $vkontakte_scopes = explode(PHP_EOL, $this->getScopes());
+    foreach ($vkontakte_scopes as $scope) {
       array_push($scopes, $scope);
     }
 
@@ -174,10 +174,10 @@ class VkontkateAuthManager extends OAuth2Manager {
   }
 
   /**
-   * Returns the Vkontkate login URL where user will be redirected.
+   * Returns the Vkontakte login URL where user will be redirected.
    *
    * @return string
-   *   Absolute Vkontkate login URL where user will be redirected
+   *   Absolute Vkontakte login URL where user will be redirected
    */
   public function getState() {
     $state = $this->client->getState();

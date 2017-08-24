@@ -1,0 +1,8 @@
+name: Social Auth Vkontakte
+type: module
+description: 'Social Auth integration for Vkontakte.'
+package: Social
+core: 8.x
+configure: social_auth_vkontakte.settings_form
+dependencies:
+  - social_auth
