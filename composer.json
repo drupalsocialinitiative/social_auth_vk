@@ -1,22 +1,26 @@
 {
-    "name": "drupal/social_auth_vk",
+    "name": "drupal/social_auth_vkontkate",
     "type": "drupal-module",
-    "description": "Social Auth integration for Vkontakte",
+    "description": "Social Auth integration for Vkontkate.",
     "keywords": ["Drupal"],
     "license": "GPL-2.0+",
-    "homepage": "https://www.drupal.org/project/social_auth_vk",
+    "homepage": "https://www.drupal.org/project/social_auth_vkontkate",
     "minimum-stability": "dev",
     "support": {
-        "issues": "https://www.drupal.org/project/issues/social_auth_vk",
-        "source": "http://cgit.drupalcode.org/social_auth_vk"
+        "issues": "https://www.drupal.org/project/issues/social_auth_vkontkate",
+        "source": "http://cgit.drupalcode.org/social_auth_vkontkate"
     },
     "require": {
-        "vladkens/vk": "~0.1.9"
+        "brutto/oauth2-vkontakte": "dev-brutto-patch-1"
     },
     "authors": [
         {
-            "name": "CimpleO",
-            "email": "dev@cimpleo.com"
+            "name": "Getulio Valentin Sánchez (gvso)",
+            "email": "valentin2507@gmail.com"
+        },
+        {
+            "name": "Himanshu Dixit (himanshu-dixit)",
+            "email": "hudixt@gmail.com"
         }
     ]
 }

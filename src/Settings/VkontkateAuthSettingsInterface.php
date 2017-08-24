@@ -1,11 +1,11 @@
 <?php
 
-namespace Drupal\social_auth_vk\Settings;
+namespace Drupal\social_auth_vkontkate\Settings;
 
 /**
- * Defines an interface for Social Auth VK settings.
+ * Defines an interface for Social Auth Vkontkate settings.
  */
-interface VkAuthSettingsInterface {
+interface VkontkateAuthSettingsInterface {
 
   /**
    * Gets the client ID.
@@ -14,14 +14,6 @@ interface VkAuthSettingsInterface {
    *   The client ID.
    */
   public function getClientId();
-
-  /**
-   * Gets the Private Key.
-   *
-   * @return string
-   *   The Private Key.
-   */
-  public function getPrivateKey();
 
   /**
    * Gets the client secret.

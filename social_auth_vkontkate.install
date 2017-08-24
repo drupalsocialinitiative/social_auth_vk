@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the Social Auth Vkontkate module.
+ */
+
+use Drupal\social_api\Utility\SocialApiImplementerInstaller;
+use Drupal\social_auth\Controller\SocialAuthController;
+
+/**
+ * Implements hook_install().
+ */
+function social_auth_vkontkate_install() {
+  SocialAuthController::setLoginButtonSettings('social_auth_vkontkate', 'social_auth_vkontkate.redirect_to_vkontkate', 'img/vkontkate_logo.svg');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function social_auth_vkontkate_uninstall() {
+  SocialAuthController::deleteLoginButtonSettings('social_auth_vkontkate');
+}
