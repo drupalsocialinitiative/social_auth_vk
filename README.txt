@@ -10,6 +10,7 @@ CONTENTS OF THIS FILE
  * Configuration
  * How it works
  * Support requests
+ * Maintainers
 
 INTRODUCTION
 ------------
