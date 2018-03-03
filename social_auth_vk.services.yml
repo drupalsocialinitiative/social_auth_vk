@@ -1,0 +1,5 @@
+services:
+  social_auth_vk.manager:
+    class: Drupal\social_auth_vk\VkontakteAuthManager
+    arguments:
+      - '@config.factory'

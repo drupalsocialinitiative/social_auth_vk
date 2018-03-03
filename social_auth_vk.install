@@ -33,13 +33,13 @@ function social_auth_microsoft_requirements($phase) {
 /**
  * Implements hook_install().
  */
-function social_auth_vkontakte_install() {
-  SocialAuthController::setLoginButtonSettings('social_auth_vkontakte', 'social_auth_vkontakte.redirect_to_vkontakte', 'img/vkontakte_logo.svg');
+function social_auth_vk_install() {
+  SocialAuthController::setLoginButtonSettings('social_auth_vk', 'social_auth_vk.redirect_to_vkontakte', 'img/vkontakte_logo.svg');
 }
 
 /**
  * Implements hook_uninstall().
  */
-function social_auth_vkontakte_uninstall() {
-  SocialAuthController::deleteLoginButtonSettings('social_auth_vkontakte');
+function social_auth_vk_uninstall() {
+  SocialAuthController::deleteLoginButtonSettings('social_auth_vk');
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\social_auth_vkontakte;
+namespace Drupal\social_auth_vk;
 
 use Drupal\social_auth\AuthManager\OAuth2Manager;
 use Drupal\Core\Config\ConfigFactory;
@@ -17,7 +17,7 @@ class VkontakteAuthManager extends OAuth2Manager {
    *   Used for accessing configuration object factory.
    */
   public function __construct(ConfigFactory $configFactory) {
-    parent::__construct($configFactory->get('social_auth_vkontakte.settings'));
+    parent::__construct($configFactory->get('social_auth_vk.settings'));
   }
 
   /**

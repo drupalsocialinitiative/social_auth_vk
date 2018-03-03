@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\social_auth_vkontakte\Form;
+namespace Drupal\social_auth_vk\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -57,7 +57,7 @@ class VkontakteAuthSettingsForm extends SocialAuthSettingsForm {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'social_auth_vkontakte_settings';
+    return 'social_auth_vk_settings';
   }
 
   /**
@@ -66,7 +66,7 @@ class VkontakteAuthSettingsForm extends SocialAuthSettingsForm {
   protected function getEditableConfigNames() {
     return array_merge(
       parent::getEditableConfigNames(),
-      ['social_auth_vkontakte.settings']
+      ['social_auth_vk.settings']
     );
   }
 
@@ -74,7 +74,7 @@ class VkontakteAuthSettingsForm extends SocialAuthSettingsForm {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('social_auth_vkontakte.settings');
+    $config = $this->config('social_auth_vk.settings');
 
     $form['vkontakte_settings'] = [
       '#type' => 'details',
@@ -115,7 +115,7 @@ class VkontakteAuthSettingsForm extends SocialAuthSettingsForm {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValues();
-    $this->config('social_auth_vkontakte.settings')
+    $this->config('social_auth_vk.settings')
       ->set('client_id', $values['client_id'])
       ->set('client_secret', $values['client_secret'])
       ->save();

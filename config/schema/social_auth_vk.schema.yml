@@ -1,4 +1,4 @@
-social_auth_vkontakte.settings:
+social_auth_vk.settings:
   type: config_object
   label: 'Social Auth Vkontakte settings'
   mapping:

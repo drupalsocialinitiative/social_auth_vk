@@ -1,4 +1,0 @@
-social_auth_vkontakte.settings.tab:
-  title: 'Vkontakte'
-  route_name: social_auth_vkontakte.settings_form
-  base_route: social_auth.integrations

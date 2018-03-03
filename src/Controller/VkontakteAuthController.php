@@ -1,12 +1,12 @@
 <?php
 
-namespace Drupal\social_auth_vkontakte\Controller;
+namespace Drupal\social_auth_vk\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\social_api\Plugin\NetworkManager;
 use Drupal\social_auth\SocialAuthDataHandler;
 use Drupal\social_auth\SocialAuthUserManager;
-use Drupal\social_auth_vkontakte\VkontakteAuthManager;
+use Drupal\social_auth_vk\VkontakteAuthManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -34,7 +34,7 @@ class VkontakteAuthController extends ControllerBase {
   /**
    * The vkontakte authentication manager.
    *
-   * @var \Drupal\social_auth_vkontakte\VkontakteAuthManager
+   * @var \Drupal\social_auth_vk\VkontakteAuthManager
    */
   private $vkontakteManager;
 
@@ -64,10 +64,10 @@ class VkontakteAuthController extends ControllerBase {
    * VkontakteAuthController constructor.
    *
    * @param \Drupal\social_api\Plugin\NetworkManager $network_manager
-   *   Used to get an instance of social_auth_vkontakte network plugin.
+   *   Used to get an instance of social_auth_vk network plugin.
    * @param \Drupal\social_auth\SocialAuthUserManager $user_manager
    *   Manages user login/registration.
-   * @param \Drupal\social_auth_vkontakte\VkontakteAuthManager $vkontakte_manager
+   * @param \Drupal\social_auth_vk\VkontakteAuthManager $vkontakte_manager
    *   Used to manage authentication methods.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request
    *   Used to access GET parameters.
@@ -86,12 +86,12 @@ class VkontakteAuthController extends ControllerBase {
     $this->loggerFactory = $logger_factory;
 
     // Sets the plugin id.
-    $this->userManager->setPluginId('social_auth_vkontakte');
+    $this->userManager->setPluginId('social_auth_vk');
 
     // Sets the session keys to nullify if user could not logged in.
     $this->userManager->setSessionKeysToNullify(['access_token', 'oauth2state']);
 
-    $this->setting = $this->config('social_auth_vkontakte.settings');
+    $this->setting = $this->config('social_auth_vk.settings');
   }
 
   /**
@@ -101,7 +101,7 @@ class VkontakteAuthController extends ControllerBase {
     return new static(
       $container->get('plugin.network.manager'),
       $container->get('social_auth.user_manager'),
-      $container->get('social_auth_vkontakte.manager'),
+      $container->get('social_auth_vk.manager'),
       $container->get('request_stack'),
       $container->get('social_auth.data_handler'),
       $container->get('logger.factory')
@@ -115,7 +115,7 @@ class VkontakteAuthController extends ControllerBase {
    */
   public function redirectToVkontakte() {
     /* @var \J4k\OAuth2\Client\Provider\Vkontakte|false $vkontakte */
-    $vkontakte = $this->networkManager->createInstance('social_auth_vkontakte')->getSdk();
+    $vkontakte = $this->networkManager->createInstance('social_auth_vk')->getSdk();
 
     // If vkontakte client could not be obtained.
     if (!$vkontakte) {
@@ -150,7 +150,7 @@ class VkontakteAuthController extends ControllerBase {
     }
 
     /* @var \J4k\OAuth2\Client\Provider\Vkontakte|false $vkontakte */
-    $vkontakte = $this->networkManager->createInstance('social_auth_vkontakte')->getSdk();
+    $vkontakte = $this->networkManager->createInstance('social_auth_vk')->getSdk();
 
     // If Vkontakte client could not be obtained.
     if (!$vkontakte) {

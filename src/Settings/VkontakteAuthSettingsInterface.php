@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\social_auth_vkontakte\Settings;
+namespace Drupal\social_auth_vk\Settings;
 
 /**
  * Defines an interface for Social Auth Vkontakte settings.

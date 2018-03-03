@@ -10,7 +10,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 /**
  * Implements hook_help().
  */
-function social_auth_vkontakte_help($route_name, RouteMatchInterface $route_match) {
+function social_auth_vk_help($route_name, RouteMatchInterface $route_match) {
   $output = '';
 
   switch ($route_name) {

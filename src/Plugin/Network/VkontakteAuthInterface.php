@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\social_auth_vkontakte\Plugin\Network;
+namespace Drupal\social_auth_vk\Plugin\Network;
 
 use Drupal\social_api\Plugin\NetworkInterface;
 
