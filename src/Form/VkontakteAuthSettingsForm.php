@@ -86,7 +86,7 @@ class VkontakteAuthSettingsForm extends SocialAuthSettingsForm {
     $form['vkontakte_settings']['client_id'] = [
       '#type' => 'textfield',
       '#required' => TRUE,
-      '#title' => $this->t('Client ID'),
+      '#title' => $this->t('Application ID'),
       '#default_value' => $config->get('client_id'),
       '#description' => $this->t('Copy the Client ID here.'),
     ];
@@ -94,7 +94,7 @@ class VkontakteAuthSettingsForm extends SocialAuthSettingsForm {
     $form['vkontakte_settings']['client_secret'] = [
       '#type' => 'textfield',
       '#required' => TRUE,
-      '#title' => $this->t('Client Secret'),
+      '#title' => $this->t('Secure key'),
       '#default_value' => $config->get('client_secret'),
       '#description' => $this->t('Copy the Client Secret here.'),
     ];
@@ -105,28 +105,6 @@ class VkontakteAuthSettingsForm extends SocialAuthSettingsForm {
       '#title' => $this->t('Authorized redirect URIs'),
       '#description' => $this->t('Copy this value to <em>Authorized redirect URIs</em> field of your Vkontakte App settings.'),
       '#default_value' => $GLOBALS['base_url'] . '/user/login/vkontakte/callback',
-    ];
-
-    $form['vkontakte_settings']['authorized_javascript_origin'] = [
-      '#type' => 'textfield',
-      '#disabled' => TRUE,
-      '#title' => $this->t('Authorized Javascript Origin'),
-      '#description' => $this->t('Copy this value to <em>Authorized Javascript Origins</em> field of your Vkontakte App settings.'),
-      '#default_value' => $this->requestContext->getHost(),
-    ];
-
-    $form['vkontakte_settings']['scopes'] = [
-      '#type' => 'textarea',
-      '#title' => $this->t('Scopes for API call'),
-      '#default_value' => $config->get('scopes'),
-      '#description' => $this->t('Define the requested scopes to make API calls.'),
-    ];
-
-    $form['vkontakte_settings']['api_calls'] = [
-      '#type' => 'textarea',
-      '#title' => $this->t('API calls to be made to collect data'),
-      '#default_value' => $config->get('api_calls'),
-      '#description' => $this->t('Define the API calls which will retrieve data from provider.'),
     ];
 
     return parent::buildForm($form, $form_state);
@@ -140,8 +118,6 @@ class VkontakteAuthSettingsForm extends SocialAuthSettingsForm {
     $this->config('social_auth_vkontakte.settings')
       ->set('client_id', $values['client_id'])
       ->set('client_secret', $values['client_secret'])
-      ->set('scopes', $values['scopes'])
-      ->set('api_calls', $values['api_calls'])
       ->save();
 
     parent::submitForm($form, $form_state);

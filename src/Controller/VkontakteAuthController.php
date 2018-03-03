@@ -90,6 +90,7 @@ class VkontakteAuthController extends ControllerBase {
 
     // Sets the session keys to nullify if user could not logged in.
     $this->userManager->setSessionKeysToNullify(['access_token', 'oauth2state']);
+
     $this->setting = $this->config('social_auth_vkontakte.settings');
   }
 
@@ -102,7 +103,7 @@ class VkontakteAuthController extends ControllerBase {
       $container->get('social_auth.user_manager'),
       $container->get('social_auth_vkontakte.manager'),
       $container->get('request_stack'),
-      $container->get('social_auth.social_auth_data_handler'),
+      $container->get('social_auth.data_handler'),
       $container->get('logger.factory')
     );
   }
@@ -113,7 +114,7 @@ class VkontakteAuthController extends ControllerBase {
    * Redirects the user to Vkontakte for authentication.
    */
   public function redirectToVkontakte() {
-    /* @var \League\OAuth2\Client\Provider\Vkontakte false $vkontakte */
+    /* @var \J4k\OAuth2\Client\Provider\Vkontakte|false $vkontakte */
     $vkontakte = $this->networkManager->createInstance('social_auth_vkontakte')->getSdk();
 
     // If vkontakte client could not be obtained.
@@ -126,9 +127,7 @@ class VkontakteAuthController extends ControllerBase {
     $this->vkontakteManager->setClient($vkontakte);
 
     // Generates the URL where the user will be redirected for Vkontakte login.
-    // If the user did not have email permission granted on previous attempt,
-    // we use the re-request URL requesting only the email address.
-    $vkontakte_login_url = $this->vkontakteManager->getVkontakteLoginUrl();
+    $vkontakte_login_url = $this->vkontakteManager->getAuthorizationUrl();
 
     $state = $this->vkontakteManager->getState();
 
@@ -150,7 +149,7 @@ class VkontakteAuthController extends ControllerBase {
       return $this->redirect('user.login');
     }
 
-    /* @var \League\OAuth2\Client\Provider\Vkontakte false $vkontakte */
+    /* @var \J4k\OAuth2\Client\Provider\Vkontakte|false $vkontakte */
     $vkontakte = $this->networkManager->createInstance('social_auth_vkontakte')->getSdk();
 
     // If Vkontakte client could not be obtained.
@@ -165,7 +164,7 @@ class VkontakteAuthController extends ControllerBase {
     $retrievedState = $this->request->getCurrentRequest()->query->get('state');
     if (empty($retrievedState) || ($retrievedState !== $state)) {
       $this->userManager->nullifySessionKeys();
-      drupal_set_message($this->t('Vkontakte login failed. Unvalid oAuth2 State.'), 'error');
+      drupal_set_message($this->t('Vkontakte login failed. Unvalid OAuth2 State.'), 'error');
       return $this->redirect('user.login');
     }
 
@@ -175,29 +174,19 @@ class VkontakteAuthController extends ControllerBase {
     $this->vkontakteManager->setClient($vkontakte)->authenticate();
 
     // Gets user's info from Vkontakte API.
-    if (!$vkontakte_profile = $this->vkontakteManager->getUserInfo()) {
+    if (!$profile = $this->vkontakteManager->getUserInfo()) {
       drupal_set_message($this->t('Vkontakte login failed, could not load Vkontakte profile. Contact site administrator.'), 'error');
       return $this->redirect('user.login');
     }
 
-    // Store the data mapped with data points define is
-    // social_auth_vkontakte settings.
-    $data = [];
+    // Gets (or not) extra initial data.
+    $data = $this->userManager->checkIfUserExists($profile->getId()) ? NULL : $this->vkontakteManager->getExtraDetails();
 
-    if (!$this->userManager->checkIfUserExists($vkontakte_profile->getId())) {
-      $api_calls = explode(PHP_EOL, $this->vkontakteManager->getApiCalls());
-
-      // Iterate through api calls define in settings and try to retrieve them.
-      foreach ($api_calls as $api_call) {
-        $call = $this->vkontakteManager->getExtraDetails($api_call);
-        array_push($data, $call);
-      }
-    }
-
-    $full_name = $vkontakte_profile->toArray()['first_name']. ' ' . $vkontakte_profile->toArray()['last_name'];
+    $info = $profile->toArray();
+    $full_name = $info['first_name'] . ' ' . $info['last_name'];
 
     // If user information could be retrieved.
-    return $this->userManager->authenticateUser($full_name, '', $vkontakte_profile->getId(), $this->vkontakteManager->getAccessToken(), $vkontakte_profile->toArray()['photo_max_orig'], json_encode($data));
+    return $this->userManager->authenticateUser($full_name, '', $profile->getId(), $this->vkontakteManager->getAccessToken(), $info['photo_max_orig'], $data);
   }
 
 }

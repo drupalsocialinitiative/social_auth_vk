@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Install, update, and uninstall functions for the Social Auth Vkontakte module.
+ * Install, update, and uninstall functions for Social Auth Vkontakte.
  */
 
 use Drupal\social_api\Utility\SocialApiImplementerInstaller;

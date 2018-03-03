@@ -3,7 +3,8 @@ social_auth_vkontakte.redirect_to_vkontakte:
   defaults:
     _controller: '\Drupal\social_auth_vkontakte\Controller\VkontakteAuthController::redirectToVkontakte'
   requirements:
-    _role: 'anonymous'
+    # Anonymous users can log in, but authenticated users can also associate a new provider.
+    _access: 'TRUE'
   options:
     no_cache: TRUE
 
@@ -12,7 +13,8 @@ social_auth_vkontakte.callback:
   defaults:
     _controller: '\Drupal\social_auth_vkontakte\Controller\VkontakteAuthController::callback'
   requirements:
-    _role: 'anonymous'
+    # Anonymous users can log in, but authenticated users can also associate a new provider.
+    _access: 'TRUE'
   options:
     no_cache: TRUE
 

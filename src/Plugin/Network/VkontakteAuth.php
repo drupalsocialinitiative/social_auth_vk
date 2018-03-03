@@ -66,7 +66,7 @@ class VkontakteAuth extends NetworkBase implements VkontakteAuthInterface {
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
-      $container->get('social_auth.social_auth_data_handler'),
+      $container->get('social_auth.data_handler'),
       $configuration,
       $plugin_id,
       $plugin_definition,
@@ -122,7 +122,7 @@ class VkontakteAuth extends NetworkBase implements VkontakteAuthInterface {
   /**
    * Sets the underlying SDK library.
    *
-   * @return \League\OAuth2\Client\Provider\Vkontakte
+   * @return \J4k\OAuth2\Client\Provider\Vkontakte
    *   The initialized 3rd party library instance.
    *
    * @throws SocialApiException
@@ -137,27 +137,23 @@ class VkontakteAuth extends NetworkBase implements VkontakteAuthInterface {
     /* @var \Drupal\social_auth_vkontakte\Settings\VkontakteAuthSettings $settings */
     $settings = $this->settings;
     // Proxy configuration data for outward proxy.
-    $proxyUrl = $this->siteSettings->get("http_client_config")["proxy"]["http"];
+    $proxyUrl = $this->siteSettings->get('http_client_config')['proxy']['http'];
+
     if ($this->validateConfig($settings)) {
       // All these settings are mandatory.
+      $league_settings = [
+        'clientId' => $settings->getClientId(),
+        'clientSecret' => $settings->getClientSecret(),
+        'redirectUri' => $this->requestContext->getCompleteBaseUrl() . '/user/login/vkontakte/callback',
+      ];
+
       if ($proxyUrl) {
-        $league_settings = [
-          'clientId' => $settings->getClientId(),
-          'clientSecret' => $settings->getClientSecret(),
-          'redirectUri' => $this->requestContext->getCompleteBaseUrl() . '/user/login/vkontakte/callback',
-          'proxy' => $proxyUrl,
-        ];
-      }
-      else {
-        $league_settings = [
-          'clientId' => $settings->getClientId(),
-          'clientSecret' => $settings->getClientSecret(),
-          'redirectUri' => $this->requestContext->getCompleteBaseUrl() . '/user/login/vkontakte/callback',
-        ];
+        $league_settings['proxy'] = $proxyUrl;
       }
 
-      return new \J4k\OAuth2\Client\Provider\Vkontakte($league_settings);
+      return new Vkontakte($league_settings);
     }
+
     return FALSE;
   }
 
