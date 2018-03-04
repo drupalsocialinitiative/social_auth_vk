@@ -15,7 +15,7 @@ use Drupal\social_auth\Controller\SocialAuthController;
  * league OAuth2 client with Composer. Check installation instructions
  * from the README.txt.
  */
-function social_auth_microsoft_requirements($phase) {
+function social_auth_vk_requirements($phase) {
 
   $requirements = [];
 
