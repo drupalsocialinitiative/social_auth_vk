@@ -11,9 +11,9 @@ use Drupal\social_auth\Controller\SocialAuthController;
 /**
  * Implements hook_requirements().
  *
- * Checks that a compatible version of oAuth2 Microsoft library for the
- * league OAuth2 client with Composer. Check installation instructions
- * from the README.txt.
+ * Checks that a compatible version of OAuth2 Vkontakte library for PHP
+ * League OAuth2 client was installed through Composer. Check installation
+ * instructions from the README.txt.
  */
 function social_auth_vk_requirements($phase) {
 
@@ -23,7 +23,7 @@ function social_auth_vk_requirements($phase) {
   \Drupal::service('module_installer')->install(['social_api']);
 
   if ($phase == 'install') {
-    $requirements = SocialApiImplementerInstaller::checkLibrary('social_auth_microsoft', 'Social Auth Microsoft', 'brutto/oauth2-vkontakte', 2.0, 3.0);
+    $requirements = SocialApiImplementerInstaller::checkLibrary('social_auth_vk', 'Social Auth Vkontakte', 'brutto/oauth2-vkontakte', 2.0, 3.0);
   }
 
   return $requirements;
