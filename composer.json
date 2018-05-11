@@ -11,7 +11,7 @@
         "source": "http://cgit.drupalcode.org/social_auth_vk"
     },
     "require": {
-        "brutto/oauth2-vkontakte": "dev-brutto-patch-1"
+        "vkcom/vk-php-sdk": "^0.2.0"
     },
     "authors": [
         {
