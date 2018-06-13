@@ -11,8 +11,8 @@ use Drupal\social_api\Plugin\NetworkBase;
 use Drupal\social_api\SocialApiException;
 use Drupal\social_auth_vk\Settings\VkontakteAuthSettings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use J4k\OAuth2\Client\Provider\Vkontakte;
 use Drupal\Core\Site\Settings;
+use VK\OAuth\VKOAuth;
 
 /**
  * Defines a Network Plugin for Social Auth Vkontakte.
@@ -32,6 +32,13 @@ use Drupal\Core\Site\Settings;
  * )
  */
 class VkontakteAuth extends NetworkBase implements VkontakteAuthInterface {
+
+  /**
+   * Stores the settings wrapper object.
+   *
+   * @var \Drupal\social_auth_vk\Settings\VkontakteAuthSettings
+   */
+  protected $settings;
 
   /**
    * The Social Auth Data Handler.
@@ -122,39 +129,23 @@ class VkontakteAuth extends NetworkBase implements VkontakteAuthInterface {
   /**
    * Sets the underlying SDK library.
    *
-   * @return \J4k\OAuth2\Client\Provider\Vkontakte
+   * @return \VK\OAuth\VKOAuth
    *   The initialized 3rd party library instance.
    *
    * @throws SocialApiException
    *   If the SDK library does not exist.
    */
   protected function initSdk() {
-
-    $class_name = 'J4k\OAuth2\Client\Provider\Vkontakte';
+    $class_name = VKOAuth::class;
     if (!class_exists($class_name)) {
-      throw new SocialApiException(sprintf('The Vkontakte Library for the league oAuth not found. Class: %s.', $class_name));
-    }
-    /* @var \Drupal\social_auth_vk\Settings\VkontakteAuthSettings $settings */
-    $settings = $this->settings;
-    // Proxy configuration data for outward proxy.
-    $proxyUrl = $this->siteSettings->get('http_client_config')['proxy']['http'];
-
-    if ($this->validateConfig($settings)) {
-      // All these settings are mandatory.
-      $league_settings = [
-        'clientId' => $settings->getClientId(),
-        'clientSecret' => $settings->getClientSecret(),
-        'redirectUri' => $this->requestContext->getCompleteBaseUrl() . '/user/login/vkontakte/callback',
-      ];
-
-      if ($proxyUrl) {
-        $league_settings['proxy'] = $proxyUrl;
-      }
-
-      return new Vkontakte($league_settings);
+      throw new SocialApiException(sprintf('The Vkontakte Library not found. Class: %s.', $class_name));
     }
 
-    return FALSE;
+    if (!$this->validateConfig($this->settings)) {
+      throw new SocialApiException('Social Auth Vkontakte not configured properly. Contact site administrator.');
+    }
+
+    return new VKOAuth();
   }
 
   /**
@@ -170,14 +161,16 @@ class VkontakteAuth extends NetworkBase implements VkontakteAuthInterface {
   protected function validateConfig(VkontakteAuthSettings $settings) {
     $client_id = $settings->getClientId();
     $client_secret = $settings->getClientSecret();
-    if (!$client_id || !$client_secret) {
+
+    $is_valid = $client_id && $client_secret;
+
+    if (!$is_valid) {
       $this->loggerFactory
         ->get('social_auth_vk')
         ->error('Define Client ID and Client Secret on module settings.');
-      return FALSE;
     }
 
-    return TRUE;
+    return $is_valid;
   }
 
 }

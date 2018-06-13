@@ -4,6 +4,7 @@ namespace Drupal\social_auth_vk\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\social_api\Plugin\NetworkManager;
+use Drupal\social_api\SocialApiException;
 use Drupal\social_auth\SocialAuthDataHandler;
 use Drupal\social_auth\SocialAuthUserManager;
 use Drupal\social_auth_vk\VkontakteAuthManager;
@@ -77,7 +78,6 @@ class VkontakteAuthController extends ControllerBase {
    *   Used for logging errors.
    */
   public function __construct(NetworkManager $network_manager, SocialAuthUserManager $user_manager, VkontakteAuthManager $vkontakte_manager, RequestStack $request, SocialAuthDataHandler $social_auth_data_handler, LoggerChannelFactoryInterface $logger_factory) {
-
     $this->networkManager = $network_manager;
     $this->userManager = $user_manager;
     $this->vkontakteManager = $vkontakte_manager;
@@ -90,8 +90,6 @@ class VkontakteAuthController extends ControllerBase {
 
     // Sets the session keys to nullify if user could not logged in.
     $this->userManager->setSessionKeysToNullify(['access_token', 'oauth2state']);
-
-    $this->setting = $this->config('social_auth_vk.settings');
   }
 
   /**
@@ -109,84 +107,102 @@ class VkontakteAuthController extends ControllerBase {
   }
 
   /**
+   * Gets the underlying SDK library.
+   *
+   * @return \VK\OAuth\VKOAuth
+   *   The VKOAuth client.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   *   Thrown when no more class is applicable.
+   */
+  protected function getSdk() {
+    /** @var \Drupal\social_auth_vk\Plugin\Network\VkontakteAuth $plugin */
+    return $this->networkManager->createInstance('social_auth_vk')->getSdk();
+  }
+
+  /**
    * Response for path 'user/login/vkontakte'.
    *
    * Redirects the user to Vkontakte for authentication.
+   *
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   *   Redirect response.
    */
   public function redirectToVkontakte() {
-    /* @var \J4k\OAuth2\Client\Provider\Vkontakte|false $vkontakte */
-    $vkontakte = $this->networkManager->createInstance('social_auth_vk')->getSdk();
+    try {
+      $vkontakte = $this->getSdk();
 
-    // If vkontakte client could not be obtained.
-    if (!$vkontakte) {
+      // Vkontakte service was returned, inject it to $vkontakteManager.
+      $this->vkontakteManager->setOAuth($vkontakte);
+
+      // Generates the URL where the user will be redirected
+      // for Vkontakte login.
+      $vkontakte_login_url = $this->vkontakteManager->getAuthorizationUrl();
+
+      $state = $this->vkontakteManager->getState();
+
+      $this->dataHandler->set('oauth2state', $state);
+
+      $response = new TrustedRedirectResponse($vkontakte_login_url);
+    }
+    catch (\Exception $exception) {
       drupal_set_message($this->t('Social Auth Vkontakte not configured properly. Contact site administrator.'), 'error');
-      return $this->redirect('user.login');
+      \Drupal::logger('Social Auth Vkontakte')->error($exception->getMessage());
+      $response = $this->redirect('user.login');
     }
 
-    // Vkontakte service was returned, inject it to $vkontakteManager.
-    $this->vkontakteManager->setClient($vkontakte);
-
-    // Generates the URL where the user will be redirected for Vkontakte login.
-    $vkontakte_login_url = $this->vkontakteManager->getAuthorizationUrl();
-
-    $state = $this->vkontakteManager->getState();
-
-    $this->dataHandler->set('oauth2state', $state);
-
-    return new TrustedRedirectResponse($vkontakte_login_url);
+    return $response;
   }
 
   /**
    * Response for path 'user/login/vkontakte/callback'.
    *
    * Vkontakte returns the user here after user has authenticated in Vkontakte.
+   *
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   *   Redirect response.
    */
   public function callback() {
-    // Checks if user cancel login via Vkontakte.
-    $error = $this->request->getCurrentRequest()->get('error');
-    if ($error == 'access_denied') {
-      drupal_set_message($this->t('You could not be authenticated.'), 'error');
-      return $this->redirect('user.login');
+    try {
+      // Checks if user cancel login via Vkontakte.
+      $error = $this->request->getCurrentRequest()->get('error');
+      if ($error === 'access_denied') {
+        throw new SocialApiException('You could not be authenticated.');
+      }
+
+      // Retreives $_GET['state'].
+      $state = $this->dataHandler->get('oauth2state');
+      $retrievedState = $this->request->getCurrentRequest()->query->get('state');
+      if (empty($retrievedState) || ($retrievedState !== $state)) {
+        $this->userManager->nullifySessionKeys();
+        throw new SocialApiException('Vkontakte login failed. Unvalid OAuth2 State.');
+      }
+
+      $vkontakte = $this->getSdk();
+      $this->vkontakteManager->setOAuth($vkontakte)->authenticate();
+
+      // Saves access token to session.
+      $this->dataHandler->set('access_token', $this->vkontakteManager->getAccessToken());
+
+      // Gets user's info from Vkontakte API.
+      $profile = $this->vkontakteManager->getUserInfo();
+      $full_name = $profile['first_name'] . ' ' . $profile['last_name'];
+
+      // Gets (or not) extra initial data.
+      $data = !$this->userManager->checkIfUserExists($profile['id'])
+        ? $this->vkontakteManager->getExtraDetails()
+        : [];
+
+      // If user information could be retrieved.
+      $response = $this->userManager->authenticateUser($full_name, $profile['email'], $profile['id'], $this->vkontakteManager->getAccessToken(), $profile['photo_max_orig'], $data);
     }
-
-    /* @var \J4k\OAuth2\Client\Provider\Vkontakte|false $vkontakte */
-    $vkontakte = $this->networkManager->createInstance('social_auth_vk')->getSdk();
-
-    // If Vkontakte client could not be obtained.
-    if (!$vkontakte) {
+    catch (\Exception $exception) {
       drupal_set_message($this->t('Social Auth Vkontakte not configured properly. Contact site administrator.'), 'error');
-      return $this->redirect('user.login');
+      \Drupal::logger('Social Auth Vkontakte')->error($exception->getMessage());
+      $response = $this->redirect('user.login');
     }
 
-    $state = $this->dataHandler->get('oauth2state');
-
-    // Retreives $_GET['state'].
-    $retrievedState = $this->request->getCurrentRequest()->query->get('state');
-    if (empty($retrievedState) || ($retrievedState !== $state)) {
-      $this->userManager->nullifySessionKeys();
-      drupal_set_message($this->t('Vkontakte login failed. Unvalid OAuth2 State.'), 'error');
-      return $this->redirect('user.login');
-    }
-
-    // Saves access token to session.
-    $this->dataHandler->set('access_token', $this->vkontakteManager->getAccessToken());
-
-    $this->vkontakteManager->setClient($vkontakte)->authenticate();
-
-    // Gets user's info from Vkontakte API.
-    if (!$profile = $this->vkontakteManager->getUserInfo()) {
-      drupal_set_message($this->t('Vkontakte login failed, could not load Vkontakte profile. Contact site administrator.'), 'error');
-      return $this->redirect('user.login');
-    }
-
-    // Gets (or not) extra initial data.
-    $data = $this->userManager->checkIfUserExists($profile->getId()) ? NULL : $this->vkontakteManager->getExtraDetails();
-
-    $info = $profile->toArray();
-    $full_name = $info['first_name'] . ' ' . $info['last_name'];
-
-    // If user information could be retrieved.
-    return $this->userManager->authenticateUser($full_name, '', $profile->getId(), $this->vkontakteManager->getAccessToken(), $info['photo_max_orig'], $data);
+    return $response;
   }
 
 }
