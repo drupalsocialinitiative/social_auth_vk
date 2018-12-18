@@ -70,6 +70,13 @@ class VkontakteAuthController extends ControllerBase {
   protected $messenger;
 
   /**
+   * Logger channel name.
+   *
+   * @var string
+   */
+  protected $loggerChannel = 'Social Auth Vkontakte';
+
+  /**
    * VkontakteAuthController constructor.
    *
    * @param \Drupal\social_api\Plugin\NetworkManager $network_manager
@@ -159,7 +166,7 @@ class VkontakteAuthController extends ControllerBase {
     }
     catch (\Exception $exception) {
       $this->messenger->addError($this->t('Social Auth Vkontakte not configured properly. Contact site administrator.'));
-      \Drupal::logger('Social Auth Vkontakte')->error($exception->getMessage());
+      $this->loggerFactory->get($this->loggerChannel)->error($exception->getMessage());
       $response = $this->redirect('user.login');
     }
 
@@ -210,7 +217,7 @@ class VkontakteAuthController extends ControllerBase {
     }
     catch (\Exception $exception) {
       $this->messenger->addError($this->t('Social Auth Vkontakte not configured properly. Contact site administrator.'));
-      \Drupal::logger('Social Auth Vkontakte')->error($exception->getMessage());
+      $this->loggerFactory->get($this->loggerChannel)->error($exception->getMessage());
       $response = $this->redirect('user.login');
     }
 
