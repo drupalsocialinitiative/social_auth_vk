@@ -3,6 +3,7 @@
 namespace Drupal\social_auth_vk\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\social_api\Plugin\NetworkManager;
 use Drupal\social_api\SocialApiException;
 use Drupal\social_auth\SocialAuthDataHandler;
@@ -62,6 +63,13 @@ class VkontakteAuthController extends ControllerBase {
   protected $loggerFactory;
 
   /**
+   * The Messenger service.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
+
+  /**
    * VkontakteAuthController constructor.
    *
    * @param \Drupal\social_api\Plugin\NetworkManager $network_manager
@@ -76,14 +84,17 @@ class VkontakteAuthController extends ControllerBase {
    *   SocialAuthDataHandler object.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    *   Used for logging errors.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger service.
    */
-  public function __construct(NetworkManager $network_manager, SocialAuthUserManager $user_manager, VkontakteAuthManager $vkontakte_manager, RequestStack $request, SocialAuthDataHandler $social_auth_data_handler, LoggerChannelFactoryInterface $logger_factory) {
+  public function __construct(NetworkManager $network_manager, SocialAuthUserManager $user_manager, VkontakteAuthManager $vkontakte_manager, RequestStack $request, SocialAuthDataHandler $social_auth_data_handler, LoggerChannelFactoryInterface $logger_factory, MessengerInterface $messenger) {
     $this->networkManager = $network_manager;
     $this->userManager = $user_manager;
     $this->vkontakteManager = $vkontakte_manager;
     $this->request = $request;
     $this->dataHandler = $social_auth_data_handler;
     $this->loggerFactory = $logger_factory;
+    $this->messenger = $messenger;
 
     // Sets the plugin id.
     $this->userManager->setPluginId('social_auth_vk');
@@ -102,7 +113,8 @@ class VkontakteAuthController extends ControllerBase {
       $container->get('social_auth_vk.manager'),
       $container->get('request_stack'),
       $container->get('social_auth.data_handler'),
-      $container->get('logger.factory')
+      $container->get('logger.factory'),
+      $container->get('messenger')
     );
   }
 
@@ -146,7 +158,7 @@ class VkontakteAuthController extends ControllerBase {
       $response = new TrustedRedirectResponse($vkontakte_login_url);
     }
     catch (\Exception $exception) {
-      drupal_set_message($this->t('Social Auth Vkontakte not configured properly. Contact site administrator.'), 'error');
+      $this->messenger->addError($this->t('Social Auth Vkontakte not configured properly. Contact site administrator.'));
       \Drupal::logger('Social Auth Vkontakte')->error($exception->getMessage());
       $response = $this->redirect('user.login');
     }
@@ -175,7 +187,7 @@ class VkontakteAuthController extends ControllerBase {
       $retrievedState = $this->request->getCurrentRequest()->query->get('state');
       if (empty($retrievedState) || ($retrievedState !== $state)) {
         $this->userManager->nullifySessionKeys();
-        throw new SocialApiException('Vkontakte login failed. Unvalid OAuth2 State.');
+        throw new SocialApiException('Vkontakte login failed. Invalid OAuth2 State.');
       }
 
       $vkontakte = $this->getSdk();
@@ -197,7 +209,7 @@ class VkontakteAuthController extends ControllerBase {
       $response = $this->userManager->authenticateUser($full_name, $profile['email'], $profile['id'], $this->vkontakteManager->getAccessToken(), $profile['photo_max_orig'], $data);
     }
     catch (\Exception $exception) {
-      drupal_set_message($this->t('Social Auth Vkontakte not configured properly. Contact site administrator.'), 'error');
+      $this->messenger->addError($this->t('Social Auth Vkontakte not configured properly. Contact site administrator.'));
       \Drupal::logger('Social Auth Vkontakte')->error($exception->getMessage());
       $response = $this->redirect('user.login');
     }
