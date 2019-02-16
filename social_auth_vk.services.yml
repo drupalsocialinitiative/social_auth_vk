@@ -3,4 +3,5 @@ services:
     class: Drupal\social_auth_vk\VkontakteAuthManager
     arguments:
       - '@config.factory'
+      - '@logger.factory'
       - '@request_stack'

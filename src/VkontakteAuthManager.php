@@ -2,8 +2,9 @@
 
 namespace Drupal\social_auth_vk;
 
-use Drupal\Core\Url;
 use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\Core\Url;
 use Drupal\social_api\SocialApiException;
 use Drupal\social_auth\AuthManager\OAuth2Manager;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -11,10 +12,9 @@ use VK\OAuth\VKOAuth;
 use VK\OAuth\VKOAuthDisplay;
 use VK\OAuth\Scopes\VKOAuthUserScope;
 use VK\OAuth\VKOAuthResponseType;
-use VK\Client\VKApiClient;
 
 /**
- * Contains all the logic for Vkontakte login integration.
+ * Contains all the logic for Vkontakte OAuth2 authentication.
  */
 class VkontakteAuthManager extends OAuth2Manager {
 
@@ -40,7 +40,7 @@ class VkontakteAuthManager extends OAuth2Manager {
   protected $client;
 
   /**
-   * The OAuth client.
+   * The VkOAuth object used for authorization.
    *
    * @var \VK\OAuth\VKOAuth
    */
@@ -54,31 +54,105 @@ class VkontakteAuthManager extends OAuth2Manager {
   protected $request;
 
   /**
+   * The secret state for the authentication.
+   *
+   * @var string
+   */
+  protected $state;
+
+  /**
    * Constructor.
    *
    * @param \Drupal\Core\Config\ConfigFactory $configFactory
    *   Used for accessing configuration object factory.
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
+   *   The logger factory.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   *   Used to get current request information.
    */
-  public function __construct(ConfigFactory $configFactory, RequestStack $request_stack) {
-    parent::__construct($configFactory->get('social_auth_vk.settings'));
+  public function __construct(ConfigFactory $configFactory,
+                              LoggerChannelFactoryInterface $logger_factory,
+                              RequestStack $request_stack) {
+    parent::__construct($configFactory->get('social_auth_vk.settings'), $logger_factory);
 
-    $this->client = new VKApiClient();
+    $this->oauth = new VKOAuth();
     $this->request = $request_stack->getCurrentRequest();
   }
 
   /**
-   * Set OAuth to authorization and authentication.
-   *
-   * @param \VK\OAuth\VKOAuth $oauth
-   *   VKOAuth object.
-   *
-   * @return \Drupal\social_auth_vk\VkontakteAuthManager
-   *   The current object.
+   * {@inheritdoc}
    */
-  public function setOAuth(VKOAuth $oauth) {
-    $this->oauth = $oauth;
+  public function authenticate() {
+    $client_id = $this->getClientId();
+    $client_secret = $this->getClientSecret();
+    $redirect_uri = $this->getRedirectUrl();
+    $code = $this->request->query->get('code');
 
-    return $this;
+    try {
+      $response = $this->oauth->getAccessToken($client_id, $client_secret, $redirect_uri, $code);
+
+      if ($response) {
+        if (isset($response['access_token'])) {
+          $this->setAccessToken($response['access_token']);
+        }
+
+        if (isset($response['email'])) {
+          $this->setEmail($response['email']);
+        }
+
+        if (isset($response['user_id'])) {
+          $this->setUserId($response['user_id']);
+        }
+      }
+    }
+    catch (\Exception $e) {
+      $this->loggerFactory->get('social_auth_vk')
+        ->error('There was an error during authentication. Exception: ' . $e->getMessage());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUserInfo() {
+
+    if (!$this->user) {
+      $user_ids = [$this->getUserId()];
+      $fields = ['id', 'first_name', 'last_name', 'photo_max_orig'];
+
+      $profile = $this->getProfileData($user_ids, $fields);
+      $profile['email'] = $this->getEmail();
+
+      $this->user = $profile;
+    }
+
+    return $this->user;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAuthorizationUrl() {
+    $client_id = $this->getClientId();
+    $redirect_uri = $this->getRedirectUrl();
+    $state = $this->getState();
+    $display = VKOAuthDisplay::PAGE;
+
+    $scopes = [VKOAuthUserScope::EMAIL, VKOAuthUserScope::OFFLINE];
+
+    $extra_scopes = $this->getScopes();
+    if ($extra_scopes) {
+      $scopes = array_merge($scopes, explode(',', $extra_scopes));
+    }
+
+    return $this->oauth->getAuthorizeUrl(VKOAuthResponseType::CODE, $client_id, $redirect_uri, $display, $scopes, $state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function requestEndPoint($method, $path, $domain = NULL, array $options = []) {
+    // TODO: Implement this method.
   }
 
   /**
@@ -132,80 +206,24 @@ class VkontakteAuthManager extends OAuth2Manager {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function authenticate() {
-    $client_id = $this->getClientId();
-    $client_secret = $this->getClientSecret();
-    $redirect_uri = $this->getRedirectUrl();
-    $code = $this->request->query->get('code');
-
-    $response = $this->oauth->getAccessToken($client_id, $client_secret, $redirect_uri, $code);
-    if ($response) {
-      if (isset($response['access_token'])) {
-        $this->setAccessToken($response['access_token']);
-      }
-
-      if (isset($response['email'])) {
-        $this->setEmail($response['email']);
-      }
-
-      if (isset($response['user_id'])) {
-        $this->setUserId($response['user_id']);
-      }
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getUserInfo() {
-    $user_ids = [$this->getUserId()];
-    $fields = ['id', 'first_name', 'last_name', 'photo_max_orig'];
-
-    $profiles = $this->loadProfilesData($user_ids, $fields);
-    $profile = reset($profiles);
-    $profile['email'] = $this->getEmail();
-
-    return $profile;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getAuthorizationUrl() {
-    $client_id = $this->getClientId();
-    $redirect_uri = $this->getRedirectUrl();
-    $state = $this->getState();
-    $display = VKOAuthDisplay::PAGE;
-
-    $scopes = [VKOAuthUserScope::EMAIL, VKOAuthUserScope::OFFLINE];
-    if ($extra_scopes = $this->getScopes()){
-      $scopes = array_merge($scopes, explode(',', $extra_scopes));
-    }
-
-    return $this->oauth->getAuthorizeUrl(VKOAuthResponseType::CODE, $client_id, $redirect_uri, $display, $scopes, $state);
-  }
-
-  /**
-   * Load profiles data.
+   * Get profile's data.
    *
    * @param array $user_ids
-   *   User ids.
+   *   The user ids.
    * @param array $fields
-   *   Fields list to load.
+   *   The fields to load.
    *
    * @return array
-   *   Profiles list.
+   *   The user profile.
    *
    * @throws \Drupal\social_api\SocialApiException
-   *   If profiles list is empty.
+   *   If profile list is empty.
    * @throws \VK\Exceptions\VKApiException
    *   Wrong request data.
    * @throws \VK\Exceptions\VKClientException
    *   Request errors.
    */
-  protected function loadProfilesData($user_ids, $fields) {
+  protected function getProfileData(array $user_ids, array $fields) {
     $profiles = $this->client->users()->get($this->getAccessToken(), [
       'fields' => $fields,
       'user_ids' => $user_ids,
@@ -215,34 +233,22 @@ class VkontakteAuthManager extends OAuth2Manager {
       throw new SocialApiException('Vkontakte login failed, could not load Vkontakte profile.');
     }
 
-    return $profiles;
+    return $profiles[0];
   }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getExtraDetails() {
-    $user_ids = [$this->getUserId()];
-    $fields = [
-      'verified', 'sex', 'bdate', 'city', 'country', 'home_town', 'education',
-      'universities', 'schools',
-    ];
-
-    $profiles = $this->loadProfilesData($user_ids, $fields);
-
-    return reset($profiles);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function requestEndPoint($path) {}
 
   /**
    * {@inheritdoc}
    */
   public function getState() {
-    return 'secret_state_code';
+    if (!$this->state) {
+      $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      $length = 32;
+
+      // Generates a random string of 32 characters.
+      $this->state = substr(str_shuffle(str_repeat($chars, ceil($length / strlen($chars)))), 1, $length);
+    }
+
+    return $this->state;
   }
 
   /**
@@ -269,13 +275,10 @@ class VkontakteAuthManager extends OAuth2Manager {
    * Get redirect url.
    *
    * @return string
-   *   Redirect url.
+   *   The redirect url.
    */
   public function getRedirectUrl() {
-    $callback_uri = Url::fromRoute('social_auth_vk.callback');
-    $callback_uri->setAbsolute();
-
-    return $callback_uri->toString(TRUE)->getGeneratedUrl();
+    return Url::fromRoute('social_auth_vk.callback')->setAbsolute()->toString();
   }
 
 }

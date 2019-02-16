@@ -12,7 +12,7 @@ use Drupal\social_api\SocialApiException;
 use Drupal\social_auth_vk\Settings\VkontakteAuthSettings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Site\Settings;
-use VK\OAuth\VKOAuth;
+use VK\Client\VKApiClient;
 
 /**
  * Defines a Network Plugin for Social Auth Vkontakte.
@@ -115,8 +115,7 @@ class VkontakteAuth extends NetworkBase implements VkontakteAuthInterface {
                               ConfigFactoryInterface $config_factory,
                               LoggerChannelFactoryInterface $logger_factory,
                               RequestContext $requestContext,
-                              Settings $settings
-  ) {
+                              Settings $settings) {
 
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $config_factory);
 
@@ -129,14 +128,14 @@ class VkontakteAuth extends NetworkBase implements VkontakteAuthInterface {
   /**
    * Sets the underlying SDK library.
    *
-   * @return \VK\OAuth\VKOAuth
+   * @return \VK\Client\VKApiClient
    *   The initialized 3rd party library instance.
    *
    * @throws SocialApiException
    *   If the SDK library does not exist.
    */
   protected function initSdk() {
-    $class_name = VKOAuth::class;
+    $class_name = VKApiClient::class;
     if (!class_exists($class_name)) {
       throw new SocialApiException(sprintf('The Vkontakte Library not found. Class: %s.', $class_name));
     }
@@ -145,7 +144,7 @@ class VkontakteAuth extends NetworkBase implements VkontakteAuthInterface {
       throw new SocialApiException('Social Auth Vkontakte not configured properly. Contact site administrator.');
     }
 
-    return new VKOAuth();
+    return new VKApiClient();
   }
 
   /**
