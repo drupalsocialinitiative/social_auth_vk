@@ -5,30 +5,7 @@
  * Install, update, and uninstall functions for Social Auth Vkontakte.
  */
 
-use Drupal\social_api\Utility\SocialApiImplementerInstaller;
 use Drupal\social_auth\Controller\SocialAuthController;
-
-/**
- * Implements hook_requirements().
- *
- * Checks that a compatible version of OAuth2 Vkontakte library for PHP
- * League OAuth2 client was installed through Composer. Check installation
- * instructions from the README.txt.
- */
-function social_auth_vk_requirements($phase) {
-
-  $requirements = [];
-
-  // Social API should be installed at this point in order to check library.
-  \Drupal::service('module_installer')->install(['social_api']);
-
-  if ($phase == 'install') {
-    $requirements = SocialApiImplementerInstaller::checkLibrary('social_auth_vk', 'Social Auth Vkontakte', 'vkcom/vk-php-sdk', 0.2, 1.0);
-  }
-
-  return $requirements;
-
-}
 
 /**
  * Implements hook_install().
