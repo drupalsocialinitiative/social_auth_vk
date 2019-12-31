@@ -47,13 +47,6 @@ class VkontakteAuthManager extends OAuth2Manager {
   protected $oauth;
 
   /**
-   * The currently active request object.
-   *
-   * @var \Symfony\Component\HttpFoundation\Request
-   */
-  protected $request;
-
-  /**
    * The secret state for the authentication.
    *
    * @var string
@@ -73,10 +66,12 @@ class VkontakteAuthManager extends OAuth2Manager {
   public function __construct(ConfigFactory $configFactory,
                               LoggerChannelFactoryInterface $logger_factory,
                               RequestStack $request_stack) {
-    parent::__construct($configFactory->get('social_auth_vk.settings'), $logger_factory);
+
+    parent::__construct($configFactory->get('social_auth_vk.settings'),
+                        $logger_factory,
+                        $request_stack->getCurrentRequest());
 
     $this->oauth = new VKOAuth();
-    $this->request = $request_stack->getCurrentRequest();
   }
 
   /**
@@ -145,7 +140,7 @@ class VkontakteAuthManager extends OAuth2Manager {
       $scopes = array_merge($scopes, explode(',', $extra_scopes));
     }
 
-    return $this->oauth->getAuthorizeUrl(VKOAuthResponseType::CODE, $client_id, $redirect_uri, $display, $scopes, $state);
+    return $this->oauth->getAuthorizeUrl(VKOAuthResponseType::CODE, (int) $client_id, $redirect_uri, $display, $scopes, $state);
   }
 
   /**

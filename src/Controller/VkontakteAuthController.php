@@ -39,7 +39,9 @@ class VkontakteAuthController extends OAuth2ControllerBase {
                               RequestStack $request,
                               SocialAuthDataHandler $data_handler) {
 
-    parent::__construct('Social Auth Vkontakte', 'social_auth_vk', $messenger, $network_manager, $user_authenticator, $vk_manager, $request, $data_handler);
+    parent::__construct('Social Auth Vkontakte', 'social_auth_vk', $messenger,
+                        $network_manager, $user_authenticator, $vk_manager,
+                        $request, $data_handler);
   }
 
   /**
